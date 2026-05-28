@@ -1,0 +1,2620 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SmartParkE.V Dashboard</title>
+
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        /* --- Base Themes & Variables --- */
+        :root {
+            /* Default Dark Theme */
+            --bg-primary: #000000;
+            --bg-secondary: rgb(138, 136, 117);
+            --bg-card: #000000ff;
+            --border-color: #ffffff;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent-blue: #00aaff;
+            --accent-green-neon: #00f6d1;
+            /* Neon Green */
+            --accent-blue-neon: #00f2ff;
+            /* Neon Blue */
+            --shadow-color: rgba(0, 170, 255, 0.3);
+            /* Blue shadow */
+            --hero-gradient-start: rgba(0, 170, 255, 0.1);
+            --hero-gradient-end: rgba(10, 10, 10, 0);
+            --nav-hover-bg: #2a2a2a;
+            --input-bg: #111;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f0f2f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: #d9d9d9;
+            --text-primary: #1f1f1f;
+            --text-secondary: #595959;
+            --accent-blue: #0077cc;
+            /* Slightly darker blue for light mode */
+            --accent-green-neon: #28a745;
+            /* Less intense green */
+            --accent-blue-neon: #0077cc;
+            --shadow-color: rgba(0, 119, 204, 0.15);
+            --hero-gradient-start: rgba(0, 119, 204, 0.08);
+            --hero-gradient-end: rgba(255, 255, 255, 0);
+            --nav-hover-bg: #e8e8e8;
+            --input-bg: #f0f2f5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            /* Apply light theme shadow */
+        }
+
+        [data-theme="neon"] {
+            --bg-primary: #000000;
+            --bg-secondary: #0d0d0d;
+            --bg-card: #151515;
+            --border-color: #444;
+            --text-primary: #e0e0e0;
+            --text-secondary: #999999;
+            --accent-blue: var(--accent-blue-neon);
+            --shadow-color: rgba(0, 242, 255, 0.4);
+            --hero-gradient-start: rgba(0, 242, 255, 0.15);
+            --hero-gradient-end: rgba(0, 0, 0, 0);
+            --nav-hover-bg: #222;
+            --input-bg: #101010;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+            /* Apply neon theme shadow */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        header {
+            padding: 1.5rem 2.5rem;
+            flex-shrink: 0;
+            user-select: none;
+            font-weight: 900;
+            font-size: 2.2rem;
+            color: var(--text-primary);
+            letter-spacing: 0.1em;
+            text-align: left;
+            background-color: var(--bg-primary);
+            z-index: 10;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* --- App Layout --- */
+        .app-wrapper {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+            /* Prevent body scroll */
+        }
+
+        #main-nav {
+            width: 240px;
+            /* Width of the sidebar */
+            flex-shrink: 0;
+            background-color: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: 0;
+            color: var(--text-secondary);
+            padding: 0.85rem 1.5rem;
+            font-size: 0.95rem;
+            /* "Very small" text */
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .nav-btn svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .nav-btn.active {
+            color: var(--text-primary);
+            background-color: var(--bg-card);
+            font-weight: 600;
+        }
+
+        .nav-btn.active svg {
+            color: var(--accent-blue);
+        }
+
+        .nav-btn:not(.active):hover {
+            color: var(--text-primary);
+            background-color: var(--nav-hover-bg);
+            /* Use theme variable */
+        }
+
+        #content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            /* Allow content to scroll */
+            background-color: var(--bg-secondary);
+            transition: background-color 0.3s ease;
+        }
+
+        /* --- Page Containers --- */
+        .page {
+            display: none;
+            /* All pages hidden by default */
+            padding: 2.5rem;
+        }
+
+        .page.active {
+            display: block;
+            /* Show the active page */
+        }
+
+        #parking-dashboard-page {
+            padding: 0;
+            height: 100%;
+        }
+
+        /* --- Generic Styles --- */
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .content-card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-definition, 0 4px 12px rgba(0, 0, 0, 0.5));
+            /* Default shadow */
+            margin-bottom: 1.5rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Define theme-specific shadows */
+        [data-theme="light"] .content-card {
+            --shadow-definition: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        [data-theme="neon"] .content-card {
+            --shadow-definition: 0 6px 15px rgba(0, 0, 0, 0.6);
+        }
+
+
+        .content-card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        /* Input fields theme adjustments */
+        input,
+        select,
+        textarea {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- Loading Screen --- */
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: var(--bg-primary);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.5s ease-out 0.5s, background-color 0.3s ease;
+            /* Fade out after 0.5s delay */
+        }
+
+        #loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 5px solid var(--border-color);
+            border-top-color: var(--accent-blue-neon);
+            /* Neon Blue */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+
+        /* --- NEW: Home Page Styles --- */
+        #home-page {
+            /* Hero Section Background */
+            position: relative;
+            overflow: hidden;
+            /* Needed for pseudo-element */
+        }
+
+        #home-page::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent,
+                    var(--hero-gradient-start),
+                    transparent 30%);
+            animation: rotateGradient 15s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes rotateGradient {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            /* Above background */
+            z-index: 1;
+            text-align: center;
+            padding: 4rem 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero-headline {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+            color: var(--text-primary);
+        }
+
+        .hero-headline .highlight {
+            color: var(--accent-green-neon);
+            /* Neon Green */
+            text-shadow: 0 0 8px var(--accent-green-neon), 0 0 12px var(--accent-green-neon);
+            animation: flicker 3s linear infinite alternate;
+        }
+
+        @keyframes flicker {
+
+            0%,
+            18%,
+            22%,
+            25%,
+            53%,
+            57%,
+            100% {
+                text-shadow: 0 0 5px var(--accent-green-neon), 0 0 8px var(--accent-green-neon), 0 0 12px var(--accent-green-neon);
+            }
+
+            20%,
+            24%,
+            55% {
+                text-shadow: none;
+            }
+        }
+
+        .hero-tagline {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+            line-height: 1.6;
+        }
+
+        /* Time & Greeting */
+        .time-greeting-widget {
+            text-align: right;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        #current-time {
+            font-weight: 600;
+        }
+
+        /* Dashboard Preview */
+        .dashboard-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .preview-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .preview-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .preview-card-title svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .counter {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            transition: color 0.3s ease;
+        }
+
+        .counter.green {
+            color: var(--status-green);
+        }
+
+        .counter.blue {
+            color: var(--accent-blue);
+        }
+
+        .counter-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+            transition: color 0.3s ease;
+        }
+
+        .demo-spots {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .demo-spot {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .demo-spot.available {
+            background-color: var(--status-green);
+        }
+
+        .demo-spot.reserved {
+            background-color: var(--status-yellow);
+        }
+
+        .demo-spot.occupied {
+            background-color: var(--status-red);
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px var(--shadow-color);
+            border-color: var(--accent-blue);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .feature-icon svg {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto;
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Testimonials */
+        .testimonial-wrapper {
+            overflow: hidden;
+            /* Hide non-visible testimonials */
+            position: relative;
+            height: 120px;
+            /* Adjust height as needed */
+            margin-bottom: 2rem;
+        }
+
+        .testimonial-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            animation: rotateTestimonials 12s linear infinite;
+        }
+
+        .testimonial-slide:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .testimonial-slide:nth-child(2) {
+            animation-delay: 4s;
+        }
+
+        .testimonial-slide:nth-child(3) {
+            animation-delay: 8s;
+        }
+
+        @keyframes rotateTestimonials {
+
+            0%,
+            25%,
+            100% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            /* Fade out, move down */
+            8%,
+            17% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            /* Fade in, stay */
+        }
+
+        .testimonial-content {
+            background-color: var(--bg-card);
+            border-left: 4px solid var(--accent-blue-neon);
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .testimonial-content blockquote {
+            font-size: 1rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+
+        .testimonial-content cite {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-style: normal;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            display: inline-block;
+            background: var(--accent-blue-neon);
+            color: #000;
+            /* Black text on neon blue */
+            padding: 1rem 2.5rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px var(--accent-blue-neon), 0 0 20px var(--accent-blue-neon);
+            animation: pulse-blue 2s infinite;
+        }
+
+        @keyframes pulse-blue {
+            0% {
+                box-shadow: 0 0 10px var(--accent-blue-neon), 0 0 20px var(--accent-blue-neon);
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 0 15px var(--accent-blue-neon), 0 0 30px var(--accent-blue-neon);
+                transform: scale(1.03);
+            }
+
+            100% {
+                box-shadow: 0 0 10px var(--accent-blue-neon), 0 0 20px var(--accent-blue-neon);
+                transform: scale(1);
+            }
+        }
+
+        .cta-button:hover {
+            filter: brightness(1.2);
+            transform: translateY(-3px);
+        }
+
+        .cta-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Theme Switcher */
+        .theme-switcher {
+            text-align: right;
+            margin-bottom: 1.5rem;
+            /* Space below switcher */
+        }
+
+        .theme-switcher button {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-switcher button.active {
+            background: var(--accent-blue);
+            color: var(--text-primary);
+            /* Use text-primary for better contrast */
+            border-color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        [data-theme="light"] .theme-switcher button.active {
+            color: #ffffff;
+        }
+
+        /* Ensure white text on blue in light mode */
+
+        .theme-switcher button:not(.active):hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+
+        /* --- End Home Page Styles --- */
+
+        /* --- Charging Page Styles --- */
+        .charging-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .charging-main-col {
+            grid-column: span 2;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .charging-sidebar-col {
+            grid-column: span 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .live-indicator::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background-color: var(--status-red);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .station-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .station-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Adjusted bg */
+        .station-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-4px);
+            box-shadow: 0 4px 15px var(--shadow-color);
+        }
+
+        /* Adjusted shadow */
+        .station-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .station-id {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .station-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .station-status.available {
+            color: var(--status-green);
+            background-color: rgba(40, 167, 69, 0.15);
+        }
+
+        .station-status.charging {
+            color: var(--status-yellow);
+            background-color: rgba(255, 193, 7, 0.15);
+        }
+
+        .station-status.offline {
+            color: var(--text-secondary);
+            background-color: rgba(108, 117, 125, 0.15);
+        }
+
+        .station-card-body {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .station-card-body svg {
+            width: 14px;
+            height: 14px;
+            margin-right: 0.25rem;
+            vertical-align: middle;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        /* Adjusted bg */
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--accent-blue);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .chart-placeholder,
+        .map-placeholder {
+            width: 100%;
+            height: 250px;
+            background-color: var(--bg-card);
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-style: italic;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Adjusted bg */
+        .map-placeholder {
+            height: 200px;
+        }
+
+        .booking-form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .booking-form label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .booking-form input,
+        .booking-form select {
+            width: 100%;
+            /* Styles inherited now */
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .booking-form .submit-btn {
+            width: 100%;
+            background-color: var(--accent-blue);
+            color: var(--text-primary);
+            border: 0;
+            border-radius: 6px;
+            padding: 0.85rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .booking-form .submit-btn:hover {
+            filter: brightness(0.85);
+        }
+
+        /* --- Contact Page Styles --- */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .contact-main-col {
+            grid-column: span 2;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-sidebar-col {
+            grid-column: span 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .contact-form label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-form input,
+        .contact-form select,
+        .contact-form textarea {
+            width: 100%;
+            /* Styles inherited */
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .contact-form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .contact-form .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .contact-form .checkbox-group label {
+            margin-bottom: 0;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .contact-form .submit-btn {
+            width: 100%;
+            background-color: var(--accent-blue);
+            color: var(--text-primary);
+            border: 0;
+            border-radius: 6px;
+            padding: 0.85rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+        }
+
+        .contact-form .submit-btn:hover {
+            filter: brightness(0.85);
+        }
+
+        .form-status-message {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .form-status-message.success {
+            display: block;
+            background-color: rgba(40, 167, 69, 0.15);
+            color: var(--status-green);
+            border: 1px solid var(--status-green);
+        }
+
+        .form-status-message.error {
+            display: block;
+            background-color: rgba(220, 53, 69, 0.15);
+            color: var(--status-red);
+            border: 1px solid var(--status-red);
+        }
+
+        .info-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-card li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .info-card li:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-card .icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            margin-top: 0.2rem;
+            color: var(--accent-blue);
+        }
+
+        .info-card .info-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .info-card .info-text strong {
+            color: var(--text-primary);
+            font-weight: 500;
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+
+        .info-card .info-text a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .info-card .info-text a:hover {
+            text-decoration: underline;
+        }
+
+        .testimonial-card {
+            background-color: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-blue);
+            transition: background-color 0.3s ease;
+        }
+
+        /* Adjusted bg */
+        .testimonial-card blockquote {
+            font-size: 0.95rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .testimonial-card .author {
+            display: block;
+            margin-top: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-style: normal;
+        }
+
+        .support-channels-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .support-channels-list li {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .support-channels-list li::before {
+            content: '✓';
+            color: var(--status-green);
+            position: absolute;
+            left: 0;
+            top: 2px;
+            font-weight: 600;
+        }
+
+        .support-channels-list a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .support-channels-list a:hover {
+            text-decoration: underline;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-blue);
+            transform: scale(1.1);
+        }
+
+        .social-links svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* --- Officials Page Styles --- */
+        .officials-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .officials-main-col {
+            grid-column: span 2;
+        }
+
+        .officials-sidebar-col {
+            grid-column: span 1;
+        }
+
+        .search-bar-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        #official-search {
+            width: 100%;
+            /* Styles inherited */
+            padding: 0.85rem 1rem 0.85rem 2.5rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .search-bar-wrapper svg {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: var(--text-secondary);
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .officials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .official-card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .official-card:hover {
+            border-color: var(--accent-blue);
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transform: translateY(-4px);
+        }
+
+        /* Adjusted shadow */
+        .official-photo-wrapper {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 1rem auto;
+            border: 3px solid var(--border-color);
+        }
+
+        .official-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .official-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .official-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .official-contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: var(--input-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        /* Adjusted bg */
+        .contact-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .contact-btn:hover {
+            background-color: var(--accent-blue);
+            color: var(--text-primary);
+            border-color: var(--accent-blue);
+        }
+
+        .official-bio-btn {
+            width: 100%;
+            background-color: transparent;
+            color: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+            border-radius: 6px;
+            padding: 0.65rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .official-bio-btn:hover {
+            background-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        .resource-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .resource-list li {
+            margin-bottom: 0.75rem;
+        }
+
+        .resource-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        /* Adjusted bg */
+        .resource-link svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            color: var(--accent-blue);
+        }
+
+        .resource-link:hover {
+            background-color: var(--nav-hover-bg);
+            color: var(--text-primary);
+            border-color: var(--accent-blue);
+        }
+
+        /* Adjusted bg */
+        .trust-badges {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 1.5rem;
+            opacity: 0.6;
+        }
+
+        .trust-badge svg {
+            width: 60px;
+            height: 60px;
+            color: var(--text-secondary);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: 0;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .modal-close-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .modal-close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            text-align: center;
+        }
+
+        .modal-photo-wrapper {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 1rem auto;
+            border: 4px solid var(--border-color);
+        }
+
+        .modal-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .modal-title-official {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--accent-blue);
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-bio {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        /* --- Parking Dashboard Styles --- */
+        .parking-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 2.5rem;
+            width: 100%;
+            height: 100%;
+        }
+
+        #category-view {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .category-card {
+            background-color: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: var(--shadow-definition, 0 4px 12px rgba(0, 0, 0, 0.75));
+        }
+
+        /* Themed shadow */
+        .category-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px var(--shadow-color);
+        }
+
+        /* Themed shadow */
+        .category-info .category-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .category-info .category-desc {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+        }
+
+        .category-stats .stats-count {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--status-green);
+            line-height: 1;
+        }
+
+        .category-stats .stats-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            text-align: right;
+            margin-top: 0.25rem;
+        }
+
+        #spot-view {
+            display: none;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .back-btn {
+            background: var(--accent-blue);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            align-self: flex-start;
+        }
+
+        [data-theme="light"] .back-btn {
+            color: #ffffff;
+        }
+
+        /* Ensure white text */
+        .back-btn:hover {
+            filter: brightness(0.85);
+            box-shadow: 0 0 15px var(--shadow-color);
+        }
+
+        /* Themed shadow */
+        #back-to-categories-btn {
+            margin-bottom: 1.5rem;
+        }
+
+        #spot-view-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            width: 100%;
+        }
+
+        #spot-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1.25rem;
+            width: 100%;
+        }
+
+        .box {
+            aspect-ratio: 1 / 1;
+            background-color: var(--input-bg);
+            border-radius: 12px;
+            border: 3px solid transparent;
+            box-shadow: var(--shadow-definition, 0 4px 12px rgba(0, 0, 0, 0.9));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            color: var(--text-primary);
+            position: relative;
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            user-select: none;
+        }
+
+        /* Adjusted bg, themed shadow */
+        .box:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 24px var(--shadow-color);
+            border-color: var(--accent-blue);
+            background-color: var(--nav-hover-bg);
+        }
+
+        /* Themed shadow, adjusted bg */
+        .box.available {
+            border-color: var(--status-green);
+            box-shadow: 0 0 12px rgba(40, 167, 69, 0.7);
+        }
+
+        .box.reserved {
+            border-color: var(--status-yellow);
+            box-shadow: 0 0 12px rgba(255, 193, 7, 0.7);
+        }
+
+        .box.occupied {
+            border-color: var(--status-red);
+            box-shadow: 0 0 12px rgba(220, 53, 69, 0.7);
+        }
+
+        /* Light theme adjustments for parking boxes */
+        [data-theme="light"] .box.available {
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+        }
+
+        [data-theme="light"] .box.reserved {
+            box-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
+        }
+
+        [data-theme="light"] .box.occupied {
+            box-shadow: 0 0 8px rgba(220, 53, 69, 0.5);
+        }
+
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+
+            .charging-grid,
+            .contact-grid,
+            .officials-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .charging-main-col,
+            .contact-main-col,
+            .officials-main-col,
+            .charging-sidebar-col,
+            .contact-sidebar-col,
+            .officials-sidebar-col {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                font-size: 1.8rem;
+                padding: 1rem 1.5rem;
+            }
+
+            #main-nav {
+                width: 60px;
+                padding: 1.5rem 0.5rem;
+            }
+
+            .nav-btn {
+                padding: 0.75rem;
+                justify-content: center;
+            }
+
+            .nav-btn span {
+                display: none;
+            }
+
+            /* Hide text on small screens */
+            .nav-btn svg {
+                margin-right: 0;
+            }
+
+            .page {
+                padding: 1.5rem;
+            }
+
+            .hero-headline {
+                font-size: 2.5rem;
+            }
+
+            .hero-tagline {
+                font-size: 1rem;
+            }
+
+            #content-area {
+                margin-left: 0;
+            }
+
+            /* Remove margin if nav is overlayed or hidden */
+        }
+
+        @media (max-width: 576px) {
+
+            .dashboard-preview-grid,
+            .features-grid,
+            .officials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-headline {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body data-theme="dark"> <!-- Default theme -->
+
+    <!-- Loading Screen -->
+    <div id="loading-overlay">
+        <div class="loader"></div>
+    </div>
+
+    <header>SmartParkE.V</header>
+
+    <div class="app-wrapper">
+        <!-- Vertical Navigation Sidebar -->
+        <nav id="main-nav">
+            <button class="nav-btn" data-page="home-page" title="Home">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+                <span>Home</span>
+            </button>
+            <button class="nav-btn" data-page="parking-dashboard-page" title="Parking">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5h1.125c.621 0 1.125-.504 1.125-1.125V14.25m0 0V4.875c0-.621.504-1.125 1.125-1.125h13.5c.621 0 1.125.504 1.125 1.125V14.25m-17.25 0h17.25" />
+                </svg>
+                <span>Parking</span>
+            </button>
+            <button class="nav-btn" data-page="charging-page" title="Charging">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                </svg>
+                <span>Charging</span>
+            </button>
+            <button class="nav-btn" data-page="contact-page" title="Contact">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                </svg>
+                <span>Contact</span>
+            </button>
+            <button class="nav-btn" data-page="officials-page" title="Officials">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v-2.25l5.227-5.227c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3.75 13.5a.75.75 0 01.75.75v4.5a.75.75 0 01-.75.75h-1.5a.75.75 0 01-.75-.75v-4.5a.75.75 0 01.75-.75h1.5zM8.25 13.5a.75.75 0 01.75.75v4.5a.75.75 0 01-.75.75H6a.75.75 0 01-.75-.75v-4.5a.75.75 0 01.75-.75h1.5zM12.75 13.5a.75.75 0 01.75.75v4.5a.75.75 0 01-.75.75h-1.5a.75.75 0 01-.75-.75v-4.5a.75.75 0 01.75-.75h1.5z" />
+                </svg>
+                <span>Officials</span>
+            </button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main id="content-area">
+
+            <!-- Page 1: Home (NEW CONTENT) -->
+            <div id="home-page" class="page">
+
+                <!-- Theme Switcher -->
+                <div class="theme-switcher">
+                    <button data-set-theme="dark">Dark</button>
+                    <button data-set-theme="light">Light</button>
+                    <button data-set-theme="neon">Neon</button>
+                </div>
+                <!-- Time/Greeting Widget -->
+                <div class="time-greeting-widget">
+                    <span id="greeting">Good evening</span>! Current time: <span id="current-time">00:00:00</span>
+                </div>
+
+                <!-- Hero Section -->
+                <div class="hero-content">
+                    <h1 class="hero-headline">Welcome to <span class="highlight">SmartParkE.V</span></h1>
+                    <p class="hero-tagline">The future of intelligent parking and EV charging management. Seamless,
+                        efficient, and connected.</p>
+                </div>
+
+                <!-- Interactive Dashboard Preview -->
+                <h2 class="content-card-title" style="font-size: 1.5rem; margin-bottom: 1rem; padding-left: 0;">Live
+                    Dashboard Preview</h2>
+                <div class="dashboard-preview-grid">
+                    <div class="preview-card">
+                        <h3 class="preview-card-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5h1.125c.621 0 1.125-.504 1.125-1.125V14.25m0 0V4.875c0-.621.504-1.125 1.125-1.125h13.5c.621 0 1.125.504 1.125 1.125V14.25m-17.25 0h17.25" />
+                            </svg>
+                            Parking Availability
+                        </h3>
+                        <div class="counter green" id="available-spots-counter">0</div>
+                        <div class="counter-label">Available Spots</div>
+                        <div class="demo-spots" id="demo-parking-spots">
+                            <div class="demo-spot available" title="Spot A1 - Available"></div>
+                            <div class="demo-spot occupied" title="Spot A2 - Occupied"></div>
+                            <div class="demo-spot available" title="Spot A3 - Available"></div>
+                            <div class="demo-spot reserved" title="Spot B1 - Reserved"></div>
+                            <div class="demo-spot available" title="Spot B2 - Available"></div>
+                        </div>
+                    </div>
+                    <div class="preview-card">
+                        <h3 class="preview-card-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                            </svg>
+                            Charging Stations
+                        </h3>
+                        <div class="counter blue" id="active-chargers-counter">0</div>
+                        <div class="counter-label">Active Charging Sessions</div>
+                        <div class="demo-spots" id="demo-charging-spots">
+                            <div class="demo-spot available" title="Charger 1 - Available"></div>
+                            <div class="demo-spot reserved" title="Charger 2 - Charging"></div>
+                            <!-- Changed class for demo -->
+                            <div class="demo-spot available" title="Charger 3 - Available"></div>
+                            <div class="demo-spot occupied" style="background-color: var(--text-secondary);"
+                                title="Charger 4 - Offline"></div> <!-- Changed class for demo -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technology Showcase -->
+                <h2 class="content-card-title" style="font-size: 1.5rem; margin-bottom: 1rem; padding-left: 0;">Core
+                    Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg></div>
+                        <h3 class="feature-title">Smart Allocation</h3>
+                        <p class="feature-desc">Intelligent algorithms assign the best available parking or charging
+                            spot.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                            </svg></div>
+                        <h3 class="feature-title">Real-Time Monitoring</h3>
+                        <p class="feature-desc">Live updates on spot occupancy and charger status via the dashboard.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg></div>
+                        <h3 class="feature-title">Booking & Reservations</h3>
+                        <p class="feature-desc">Secure your spot or charging session in advance with easy booking.</p>
+                    </div>
+                </div>
+
+                <!-- Testimonials -->
+                <h2 class="content-card-title" style="font-size: 1.5rem; margin-bottom: 1rem; padding-left: 0;">What
+                    Users Say</h2>
+                <div class="testimonial-wrapper">
+                    <div class="testimonial-slide">
+                        <div class="testimonial-content">
+                            <blockquote>"SmartParkE.V has revolutionized how we manage our facility parking. The
+                                real-time data is invaluable!"</blockquote>
+                            <cite>- Facility Manager</cite>
+                        </div>
+                    </div>
+                    <div class="testimonial-slide">
+                        <div class="testimonial-content">
+                            <blockquote>"Finding an available EV charger used to be stressful. This app makes it
+                                incredibly simple and reliable."</blockquote>
+                            <cite>- EV Driver</cite>
+                        </div>
+                    </div>
+                    <div class="testimonial-slide">
+                        <div class="testimonial-content">
+                            <blockquote>"The interface is so intuitive and the booking system works flawlessly every
+                                time. Highly recommended!"</blockquote>
+                            <cite>- Tech Early Adopter</cite>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call to Action -->
+                <div class="cta-container">
+                    <button class="cta-button"
+                        onclick="document.querySelector('.nav-btn[data-page=\'parking-dashboard-page\']').click()">Explore
+                        Parking</button>
+                </div>
+
+            </div>
+
+            <!-- Page 2: Parking Dashboard -->
+            <div id="parking-dashboard-page" class="page">
+                <div class="parking-container">
+                    <div id="category-view"></div>
+                    <div id="spot-view">
+                        <button id="back-to-categories-btn" class="back-btn">
+                            <span>&larr;</span> Back to Categories
+                        </button>
+                        <h2 id="spot-view-title"></h2>
+                        <div id="spot-grid-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 3: Charging -->
+            <div id="charging-page" class="page">
+                <h1 class="page-title">Charging Dashboard</h1>
+                <div class="charging-grid">
+                    <div class="charging-main-col">
+                        <div class="content-card">
+                            <h2 class="content-card-title"><span>Live Station Status</span><span
+                                    class="live-indicator">Live</span></h2>
+                            <div class="station-grid">
+                                <div class="station-card">
+                                    <div class="station-card-header"><span class="station-id">EV-001</span><span
+                                            class="station-status available">Available</span></div>
+                                    <div class="station-card-body">
+                                        <div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" />
+                                            </svg>50 kW</div>
+                                        <div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                                            </svg>CCS/Type 2</div>
+                                    </div>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar-fill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                                <div class="station-card">
+                                    <div class="station-card-header"><span class="station-id">EV-002</span><span
+                                            class="station-status charging">Charging</span></div>
+                                    <div class="station-card-body">
+                                        <div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" />
+                                            </svg>150 kW</div>
+                                        <div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                                            </svg>CCS</div>
+                                    </div>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar-fill" style="width: 70%;"></div>
+                                    </div>
+                                </div>
+                                <div class="station-card">
+                                    <div class="station-card-header"><span class="station-id">EV-003</span><span
+                                            class="station-status offline">Offline</span></div>
+                                    <div class="station-card-body">
+                                        <div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" />
+                                            </svg>50 kW</div>
+                                        <div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                                            </svg>Type 2</div>
+                                    </div>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar-fill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content-card">
+                            <h2 class="content-card-title">Data Visualization</h2>
+                            <div class="chart-grid">
+                                <div class="chart-placeholder">Energy Usage (kWh) - Chart</div>
+                                <div class="chart-placeholder">Peak Times - Chart</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="charging-sidebar-col">
+                        <div class="content-card">
+                            <h2 class="content-card-title">Book a Station</h2>
+                            <form class="booking-form" onsubmit="event.preventDefault();">
+                                <div class="form-group"><label for="station-select">Station</label><select
+                                        id="station-select" name="station">
+                                        <option value="ev001">EV-001 (50 kW, CCS/Type 2)</option>
+                                        <option value="ev002">EV-002 (150 kW, CCS)</option>
+                                        <option value="ev003" disabled>EV-003 (Offline)</option>
+                                    </select></div>
+                                <div class="form-group"><label for="time-select">Start Time</label><input
+                                        type="datetime-local" id="time-select" name="time"></div>
+                                <div class="form-group"><label for="duration-select">Duration (minutes)</label><select
+                                        id="duration-select" name="duration">
+                                        <option value="30">30 minutes</option>
+                                        <option value="60">60 minutes</option>
+                                        <option value="90">90 minutes</option>
+                                    </select></div>
+                                <button type="submit" class="submit-btn">Book Now</button>
+                            </form>
+                        </div>
+                        <div class="content-card">
+                            <h2 class="content-card-title">Station Map</h2>
+                            <div class="map-placeholder"><span>Live Map Placeholder</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 4: Contact -->
+            <div id="contact-page" class="page">
+                <h1 class="page-title">Contact Us</h1>
+                <div class="contact-grid">
+                    <div class="contact-main-col">
+                        <div class="content-card">
+                            <h2 class="content-card-title">Send us a Message</h2>
+                            <form class="contact-form" id="contact-form">
+                                <div class="form-group"><label for="contact-name">Name</label><input type="text"
+                                        id="contact-name" name="name" required></div>
+                                <div class="form-group"><label for="contact-email">Email</label><input type="email"
+                                        id="contact-email" name="email" required></div>
+                                <div class="form-group"><label for="contact-subject">Subject</label><input type="text"
+                                        id="contact-subject" name="subject" required></div>
+                                <div class="form-group"><label for="contact-message">Message</label><textarea
+                                        id="contact-message" name="message" rows="5" required></textarea></div>
+                                <div class="checkbox-group"><input type="checkbox" id="contact-robot" name="robot"
+                                        required><label for="contact-robot">I am not a robot</label></div>
+                                <button type="submit" class="submit-btn">Send Message</button>
+                                <div class="form-status-message" id="contact-form-status"></div>
+                            </form>
+                        </div>
+                        <div class="content-card">
+                            <h2 class="content-card-title">Support Channels</h2>
+                            <p class="placeholder-text" style="margin-bottom: 1.5rem;">Our team is available 24/7.
+                                Expected response time for emails is 2-4 hours. For immediate assistance, please use our
+                                live chat or call us.</p>
+                            <ul class="support-channels-list">
+                                <li>Phone, Email & Live Chat</li>
+                                <li><a href="#">Help Center & FAQs</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                            <h3 style="font-size: 1.1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 1rem;">
+                                Connect With Us</h3>
+                            <div class="social-links">
+                                <a href="#" title="Twitter/X"><svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z">
+                                        </path>
+                                    </svg></a>
+                                <a href="#" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4z">
+                                        </path>
+                                    </svg></a>
+                                <a href="#" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M6.94 5a2 2 0 1 1-4-.002 2 2 0 0 1 4 .002zM7 8.48H3V21h4V8.48zm6.32 0H9.34V21h3.94v-6.57c0-3.66 4.77-4 4.77 0V21H22v-7.93c0-6.17-7.06-5.94-8.68-2.91z">
+                                        </path>
+                                    </svg></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-sidebar-col">
+                        <div class="content-card info-card">
+                            <h2 class="content-card-title">Contact Information</h2>
+                            <ul>
+                                <li>
+                                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                        </svg></div>
+                                    <div class="info-text"><strong>Physical Address</strong><a
+                                            href="https://maps.google.com/?q=123+Innovation+Drive,+Tech+Park,+12345"
+                                            target="_blank" rel="noopener noreferrer">123 Innovation Drive<br>Tech Park,
+                                            TS 12345</a></div>
+                                </li>
+                                <li>
+                                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                                        </svg></div>
+                                    <div class="info-text"><strong>Customer Support</strong><a href="tel:+1234567890">+1
+                                            (234) 567-890</a></div>
+                                </li>
+                                <li>
+                                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                        </svg></div>
+                                    <div class="info-text"><strong>Official Email</strong><a
+                                            href="mailto:support@smartparkev.com">support@smartparkev.com</a></div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="content-card info-card">
+                            <h2 class="content-card-title">Operating Hours</h2>
+                            <ul>
+                                <li>
+                                    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg></div>
+                                    <div class="info-text"><strong>Support Team (IST)</strong> Mon - Fri: 8:00 AM -
+                                        10:00 PM<br> Sat - Sun: 10:00 AM - 6:00 PM</div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="content-card">
+                            <h2 class="content-card-title">Testimonials</h2>
+                            <div class="testimonial-card">
+                                <blockquote>"The support team at SmartParkE.V was incredibly fast and helpful. They
+                                    resolved my charging issue in minutes!"</blockquote><cite class="author">- A.
+                                    User</cite>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 5: Officials -->
+            <div id="officials-page" class="page">
+                <h1 class="page-title">Our Leadership</h1>
+                <div class="officials-layout">
+                    <div class="officials-main-col">
+                        <div class="content-card">
+                            <h2 class="content-card-title">Message from Leadership</h2>
+                            <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen></iframe></div>
+                        </div>
+                        <div class="search-bar-wrapper">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                            </svg>
+                            <input type="search" id="official-search" placeholder="Filter by name or title...">
+                        </div>
+                        <div class="officials-grid" id="officials-grid">
+                            <div class="official-card" data-name="Jane Doe" data-title="Chief Executive Officer (CEO)">
+                                <div class="official-photo-wrapper"><img
+                                        src="https://placehold.co/150x150/444/FFF?text=JD" alt="Headshot of Jane Doe"
+                                        class="official-photo"></div>
+                                <h3 class="official-name">Jane Doe</h3>
+                                <p class="official-title">Chief Executive Officer (CEO)</p>
+                                <div class="official-contact-links">
+                                    <a href="mailto:jane.doe@smartparkev.com" class="contact-btn"
+                                        title="Email Jane Doe"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                        </svg></a>
+                                    <a href="tel:+1234567001" class="contact-btn" title="Call Jane Doe"><svg
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                                        </svg></a>
+                                    <a href="#" class="contact-btn" title="Jane Doe's LinkedIn Profile"><svg
+                                            viewBox="0 0 24 24" fill="currentColor">
+                                            <path
+                                                d="M6.94 5a2 2 0 1 1-4-.002 2 2 0 0 1 4 .002zM7 8.48H3V21h4V8.48zm6.32 0H9.34V21h3.94v-6.57c0-3.66 4.77-4 4.77 0V21H22v-7.93c0-6.17-7.06-5.94-8.68-2.91z">
+                                            </path>
+                                        </svg></a>
+                                </div>
+                                <button class="official-bio-btn" data-modal-id="official-bio-modal">View Full
+                                    Bio</button>
+                                <div class="official-bio-data" style="display: none;">Jane Doe is a visionary leader
+                                    with over 20 years of experience in the technology and sustainable energy sectors.
+                                    She guides the strategic direction of SmartParkE.V, focusing on innovation and
+                                    customer-centric solutions.</div>
+                            </div>
+                            <div class="official-card" data-name="John Smith"
+                                data-title="Chief Technology Officer (CTO)">
+                                <div class="official-photo-wrapper"><img
+                                        src="https://placehold.co/150x150/555/FFF?text=JS" alt="Headshot of John Smith"
+                                        class="official-photo"></div>
+                                <h3 class="official-name">John Smith</h3>
+                                <p class="official-title">Chief Technology Officer (CTO)</p>
+                                <div class="official-contact-links">
+                                    <a href="mailto:john.smith@smartparkev.com" class="contact-btn"
+                                        title="Email John Smith"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                        </svg></a>
+                                    <a href="#" class="contact-btn" title="John Smith's LinkedIn Profile"><svg
+                                            viewBox="0 0 24 24" fill="currentColor">
+                                            <path
+                                                d="M6.94 5a2 2 0 1 1-4-.002 2 2 0 0 1 4 .002zM7 8.48H3V21h4V8.48zm6.32 0H9.34V21h3.94v-6.57c0-3.66 4.77-4 4.77 0V21H22v-7.93c0-6.17-7.06-5.94-8.68-2.91z">
+                                            </path>
+                                        </svg></a>
+                                </div>
+                                <button class="official-bio-btn" data-modal-id="official-bio-modal">View Full
+                                    Bio</button>
+                                <div class="official-bio-data" style="display: none;">As CTO, John Smith leads our
+                                    engineering and R&D departments. He is the architect behind our robust and scalable
+                                    platform, ensuring reliability and cutting-edge features for all users.</div>
+                            </div>
+                            <div class="official-card" data-name="Emily White"
+                                data-title="Chief Operating Officer (COO)">
+                                <div class="official-photo-wrapper"><img
+                                        src="https://placehold.co/150x150/666/FFF?text=EW" alt="Headshot of Emily White"
+                                        class="official-photo"></div>
+                                <h3 class="official-name">Emily White</h3>
+                                <p class="official-title">Chief Operating Officer (COO)</p>
+                                <div class="official-contact-links">
+                                    <a href="mailto:emily.white@smartparkev.com" class="contact-btn"
+                                        title="Email Emily White"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                        </svg></a>
+                                    <a href="#" class="contact-btn" title="Emily White's LinkedIn Profile"><svg
+                                            viewBox="0 0 24 24" fill="currentColor">
+                                            <path
+                                                d="M6.94 5a2 2 0 1 1-4-.002 2 2 0 0 1 4 .002zM7 8.48H3V21h4V8.48zm6.32 0H9.34V21h3.94v-6.57c0-3.66 4.77-4 4.77 0V21H22v-7.93c0-6.17-7.06-5.94-8.68-2.91z">
+                                            </path>
+                                        </svg></a>
+                                </div>
+                                <button class="official-bio-btn" data-modal-id="official-bio-modal">View Full
+                                    Bio</button>
+                                <div class="official-bio-data" style="display: none;">Emily White oversees all daily
+                                    operations, customer support, and field management. Her expertise in logistics
+                                    ensures that our network of parking and charging stations operates at peak
+                                    efficiency.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="officials-sidebar-col">
+                        <div class="content-card">
+                            <h2 class="content-card-title">Official Resources</h2>
+                            <ul class="resource-list">
+                                <li><a href="#" class="resource-link"><svg xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                                        </svg><span>Organizational Chart</span></a></li>
+                                <li><a href="#" class="resource-link"><svg xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                        </svg><span>2024 Annual Report</span></a></li>
+                            </ul>
+                        </div>
+                        <div class="content-card">
+                            <h2 class="content-card-title">Trust & Certifications</h2>
+                            <div class="trust-badges">
+                                <div class="trust-badge" title="ISO 9001 Certified"><svg
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.333 9-6.03 9-11.623 0-1.604-.38-3.112-1.054-4.473A11.959 11.959 0 0115 2.714" />
+                                    </svg></div>
+                                <div class="trust-badge" title="Green Energy Partner"><svg
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+                                    </svg></div>
+                                <div class="trust-badge" title="Data Secure"><svg xmlns="http://www.w3.org/2000/svg"
+                                        fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                                    </svg></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal for Official Bio -->
+    <div class="modal-overlay" id="official-bio-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title-header">Official Profile</span>
+                <button class="modal-close-btn" data-modal-id="official-bio-modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-photo-wrapper"><img src="" alt="Headshot" class="modal-photo" id="modal-bio-photo">
+                </div>
+                <h3 class="modal-name" id="modal-bio-name"></h3>
+                <p class="modal-title-official" id="modal-bio-title"></p>
+                <p class="modal-bio" id="modal-bio-text"></p>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- START: PARKING DASHBOARD APP ---
+        const CATEGORIES = {
+            bike: { label: 'Bikes', desc: '2-Wheelers', prefix: 'BK', totalSpots: 20 },
+            autorickshaw: { label: 'Auto Rickshaws', desc: '3-Wheelers', prefix: 'AR', totalSpots: 15 },
+            car: { label: 'Cars', desc: '4-Wheelers', prefix: 'CR', totalSpots: 30 },
+            bus: { label: 'Buses', desc: '4W / 6W', prefix: 'BS', totalSpots: 10 },
+            truck: { label: 'Trucks', desc: '4W / 8W / 12W', prefix: 'TR', totalSpots: 10 },
+        };
+        const STATUSES = ['available', 'reserved', 'occupied'];
+        let parkingSpots = [];
+        let currentView = 'category'; // 'category' or 'spot'
+        let selectedCategory = null;
+
+        const categoryViewEl = document.getElementById('category-view');
+        const spotViewEl = document.getElementById('spot-view');
+        const backToCategoriesBtnEl = document.getElementById('back-to-categories-btn');
+        const spotViewTitleEl = document.getElementById('spot-view-title');
+        const spotGridContainerEl = document.getElementById('spot-grid-container');
+
+        function generateInitialData() { /* ... (parking data generation unchanged) ... */
+            parkingSpots = [];
+            for (const [categoryKey, config] of Object.entries(CATEGORIES)) {
+                for (let i = 1; i <= config.totalSpots; i++) {
+                    parkingSpots.push({
+                        id: `${config.prefix}-${String(i).padStart(2, '0')}`,
+                        category: categoryKey,
+                        status: STATUSES[Math.floor(Math.random() * STATUSES.length)],
+                    });
+                }
+            }
+        }
+        function renderParkingApp() { /* ... (parking render logic unchanged) ... */
+            if (currentView === 'category') {
+                spotViewEl.style.display = 'none';
+                categoryViewEl.style.display = 'flex';
+                renderCategoryView();
+            } else {
+                categoryViewEl.style.display = 'none';
+                spotViewEl.style.display = 'block';
+                renderSpotView();
+            }
+        }
+        function renderCategoryView() { /* ... (parking category render unchanged) ... */
+            const existingCards = categoryViewEl.querySelectorAll('.category-card');
+            existingCards.forEach(card => card.remove());
+            for (const [categoryKey, config] of Object.entries(CATEGORIES)) {
+                const spotsForCategory = parkingSpots.filter((s) => s.category === categoryKey);
+                const availableCount = spotsForCategory.filter((s) => s.status === 'available').length;
+                const totalCount = spotsForCategory.length;
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.innerHTML = `
+                  <div class="category-info">
+                    <div class="category-title">${config.label}</div>
+                    <div class="category-desc">${config.desc}</div>
+                  </div>
+                  <div class="category-stats">
+                    <div class="stats-count">${availableCount} / ${totalCount}</div>
+                    <div class="stats-label">Available</div>
+                  </div>
+                `;
+                card.addEventListener('click', () => showSpotView(categoryKey));
+                categoryViewEl.appendChild(card);
+            }
+        }
+        function renderSpotView() { /* ... (parking spot render unchanged) ... */
+            if (!selectedCategory) return;
+            spotViewTitleEl.textContent = `${CATEGORIES[selectedCategory].label} Spots`;
+            spotGridContainerEl.innerHTML = '';
+            const spotsToShow = parkingSpots.filter((s) => s.category === selectedCategory);
+            spotsToShow.forEach((spot) => {
+                const box = document.createElement('div');
+                box.className = 'box ' + spot.status;
+                box.textContent = spot.id;
+                box.title = `Spot ${spot.id} - ${spot.status.toUpperCase()}`;
+                box.addEventListener('click', () => cycleSpotStatus(spot.id));
+                spotGridContainerEl.appendChild(box);
+            });
+        }
+        function showSpotView(categoryKey) { /* ... (parking state update unchanged) ... */
+            selectedCategory = categoryKey; currentView = 'spot'; renderParkingApp();
+        }
+        function showCategoryView() { /* ... (parking state update unchanged) ... */
+            selectedCategory = null; currentView = 'category'; renderParkingApp();
+        }
+        function cycleSpotStatus(id) { /* ... (parking state update unchanged) ... */
+            const spot = parkingSpots.find((s) => s.id === id);
+            if (!spot) return;
+            if (spot.status === 'available') spot.status = 'reserved';
+            else if (spot.status === 'reserved') spot.status = 'occupied';
+            else spot.status = 'available';
+            renderParkingApp();
+        }
+        // --- END: PARKING DASHBOARD APP ---
+
+
+        // --- START: MAIN NAVIGATION ---
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const pages = document.querySelectorAll('.page');
+
+        function showPage(pageId) { /* ... (page switching logic unchanged) ... */
+            // Hide all pages
+            pages.forEach(page => { page.classList.remove('active'); });
+            // Remove 'active' from all nav buttons
+            navButtons.forEach(btn => { btn.classList.remove('active'); });
+            // Show the target page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) { targetPage.classList.add('active'); }
+            // Set the corresponding nav button to 'active'
+            const targetNavButton = document.querySelector(`.nav-btn[data-page="${pageId}"]`);
+            if (targetNavButton) { targetNavButton.classList.add('active'); }
+        }
+
+        navButtons.forEach(btn => { /* ... (page switching logic unchanged) ... */
+            btn.addEventListener('click', () => {
+                const pageId = btn.dataset.page;
+                showPage(pageId);
+                // If clicking 'Parking', always reset to category view
+                if (pageId === 'parking-dashboard-page') { showCategoryView(); }
+            });
+        });
+
+        // --- START: CONTACT FORM VALIDATION ---
+        const contactForm = document.getElementById('contact-form');
+        const formStatus = document.getElementById('contact-form-status');
+
+        if (contactForm) { /* ... (contact form validation unchanged) ... */
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                formStatus.textContent = ''; formStatus.className = 'form-status-message';
+                const name = document.getElementById('contact-name').value;
+                const email = document.getElementById('contact-email').value;
+                const subject = document.getElementById('contact-subject').value;
+                const message = document.getElementById('contact-message').value;
+                const notRobot = document.getElementById('contact-robot').checked;
+                let errors = [];
+                if (!name || name.trim() === '') errors.push('Name is required');
+                if (!subject || subject.trim() === '') errors.push('Subject is required');
+                if (!message || message.trim() === '') errors.push('Message is required');
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email || !emailRegex.test(email)) { errors.push('Please enter a valid email address'); }
+                if (!notRobot) { errors.push('Please confirm you are not a robot'); }
+                if (errors.length > 0) { formStatus.textContent = errors.join('. '); formStatus.classList.add('error'); }
+                else { formStatus.textContent = 'Thank you! Message sent (simulated).'; formStatus.classList.add('success'); contactForm.reset(); }
+            });
+        }
+        // --- END: CONTACT FORM VALIDATION ---
+
+
+        // --- START: OFFICIALS PAGE LOGIC ---
+        const officialSearch = document.getElementById('official-search');
+        const officialsGrid = document.getElementById('officials-grid'); // Target the grid directly
+
+        if (officialSearch && officialsGrid) { /* ... (officials search unchanged) ... */
+            officialSearch.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const officialCards = officialsGrid.querySelectorAll('.official-card'); // Query inside handler
+                officialCards.forEach(card => {
+                    const name = card.dataset.name.toLowerCase();
+                    const title = card.dataset.title.toLowerCase();
+                    if (name.includes(searchTerm) || title.includes(searchTerm)) { card.style.display = 'block'; }
+                    else { card.style.display = 'none'; }
+                });
+            });
+        }
+
+        // Modal Logic
+        const bioButtons = document.querySelectorAll('.official-bio-btn');
+        const bioModal = document.getElementById('official-bio-modal');
+
+        if (bioModal) { /* ... (officials modal logic unchanged) ... */
+            const modalCloseBtns = bioModal.querySelectorAll('.modal-close-btn');
+            const openModal = (modalId) => { const modal = document.getElementById(modalId); if (modal) modal.classList.add('active'); }
+            const closeModal = (modalId) => { const modal = document.getElementById(modalId); if (modal) modal.classList.remove('active'); }
+            bioButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const modalId = btn.dataset.modalId;
+                    const card = btn.closest('.official-card');
+                    const photoSrc = card.querySelector('.official-photo').src;
+                    const name = card.querySelector('.official-name').textContent;
+                    const title = card.querySelector('.official-title').textContent;
+                    const bio = card.querySelector('.official-bio-data').textContent;
+                    const modal = document.getElementById(modalId);
+                    modal.querySelector('#modal-bio-photo').src = photoSrc;
+                    modal.querySelector('#modal-bio-name').textContent = name;
+                    modal.querySelector('#modal-bio-title').textContent = title;
+                    modal.querySelector('#modal-bio-text').textContent = bio.trim();
+                    openModal(modalId);
+                });
+            });
+            modalCloseBtns.forEach(btn => { btn.addEventListener('click', () => { closeModal(btn.closest('.modal-overlay').id); }); });
+            bioModal.addEventListener('click', (e) => { if (e.target === bioModal) { closeModal(bioModal.id); } });
+        }
+        // --- END: OFFICIALS PAGE LOGIC ---
+
+        // --- START: HOME PAGE DYNAMIC ELEMENTS ---
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const currentTimeEl = document.getElementById('current-time');
+        const greetingEl = document.getElementById('greeting');
+        const availableSpotsCounterEl = document.getElementById('available-spots-counter');
+        const activeChargersCounterEl = document.getElementById('active-chargers-counter');
+        const demoParkingSpotsContainer = document.getElementById('demo-parking-spots');
+        const themeSwitcherButtons = document.querySelectorAll('.theme-switcher button');
+
+        // Update Clock
+        function updateClock() { /* ... (clock logic unchanged) ... */
+            if (currentTimeEl) {
+                const now = new Date();
+                currentTimeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+        }
+
+        // Update Greeting
+        function updateGreeting() { /* ... (greeting logic unchanged) ... */
+            if (greetingEl) {
+                const hour = new Date().getHours();
+                if (hour < 12) greetingEl.textContent = 'Good morning';
+                else if (hour < 18) greetingEl.textContent = 'Good afternoon';
+                else greetingEl.textContent = 'Good evening';
+            }
+        }
+
+        // Animate Counter
+        function animateCounter(element, targetValue) { /* ... (counter animation unchanged) ... */
+            if (!element) return;
+            let currentValue = 0;
+            const duration = 1500; // ms
+            const stepTime = 50; // ms
+            const steps = duration / stepTime;
+            const increment = targetValue / steps;
+
+            const interval = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    element.textContent = targetValue;
+                    clearInterval(interval);
+                } else {
+                    element.textContent = Math.ceil(currentValue);
+                }
+            }, stepTime);
+        }
+
+        // Simulate Dashboard Updates
+        function updateDashboardPreview() { /* ... (dashboard simulation unchanged) ... */
+            // Simulate changing data
+            const randomAvailable = Math.floor(Math.random() * 50) + 150; // e.g., 150-199
+            const randomCharging = Math.floor(Math.random() * 5) + 1; // e.g., 1-5
+
+            animateCounter(availableSpotsCounterEl, randomAvailable);
+            animateCounter(activeChargersCounterEl, randomCharging);
+        }
+
+        // Make demo spots interactive
+        if (demoParkingSpotsContainer) { /* ... (demo spots interaction unchanged) ... */
+            const demoSpots = demoParkingSpotsContainer.querySelectorAll('.demo-spot');
+            demoSpots.forEach(spot => {
+                spot.addEventListener('click', () => {
+                    // Get current status classes
+                    const isAvailable = spot.classList.contains('available');
+                    const isReserved = spot.classList.contains('reserved');
+                    const isOccupied = spot.classList.contains('occupied');
+                    let newStatus = 'available'; // Default next state
+                    let newTitlePart = 'Available';
+
+                    if (isAvailable) {
+                        newStatus = 'reserved';
+                        newTitlePart = 'Reserved';
+                    } else if (isReserved) {
+                        newStatus = 'occupied';
+                        newTitlePart = 'Occupied';
+                    } // If occupied, it loops back to available
+
+                    // Update class and title
+                    spot.className = `demo-spot ${newStatus}`; // Reset classes and add new one
+                    // Update title (assuming format like "Spot X - Status")
+                    const titleParts = spot.title.split(' - ');
+                    if (titleParts.length === 2) {
+                        spot.title = `${titleParts[0]} - ${newTitlePart}`;
+                    }
+                });
+            });
+        }
+
+        // --- START: THEME SWITCHING --- // <<< FIX IS HERE
+        function applyTheme(theme) {
+            document.body.setAttribute('data-theme', theme); // Set attribute on body
+            localStorage.setItem('smartpark-theme', theme);
+            // Update button active state
+            themeSwitcherButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.setTheme === theme);
+            });
+        }
+
+        themeSwitcherButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                applyTheme(button.dataset.setTheme);
+            });
+        });
+
+        // Load saved theme or default
+        const savedTheme = localStorage.getItem('smartpark-theme') || 'dark'; // Default to dark
+        // --- END: THEME SWITCHING --- // <<< FIX IS HERE
+
+
+        // --- END: HOME PAGE DYNAMIC ELEMENTS ---
+
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            // Apply initial theme ASAP before showing content
+            applyTheme(savedTheme);
+
+            // Hide loading screen after a short delay
+            if (loadingOverlay) {
+                setTimeout(() => {
+                    loadingOverlay.classList.add('hidden');
+                }, 500); // Adjust delay as needed
+            }
+
+            // Start clock and greeting
+            updateClock();
+            updateGreeting();
+            setInterval(updateClock, 1000);
+
+            // Initialize parking app data
+            generateInitialData();
+            // Render the parking sub-app (it's hidden, but ready)
+            renderParkingApp();
+            // Attach listener for the "Back to Categories" button
+            if (backToCategoriesBtnEl) {
+                backToCategoriesBtnEl.addEventListener('click', showCategoryView);
+            }
+
+            // Show the default 'home' page
+            showPage('home-page');
+
+            // Start dashboard preview animation
+            updateDashboardPreview();
+            // Optional: update preview periodically
+            setInterval(updateDashboardPreview, 10000); // Update every 10 seconds
+        };
+    </script>
+</body>
+
+</html>
